@@ -2,7 +2,7 @@ name: Ejecutar script diario
 
 on:
   schedule:
-    - cron: '42 11 * * *'
+    - cron: '*/5 * * * *'
 
 jobs:
   run-script:
