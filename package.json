@@ -1,0 +1,23 @@
+{
+  "name": "toyo-reservations",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "tsx index.ts",
+    "list": "node list.ts",
+    "reserve": "node reserve.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "typescript": "^5.5.4"
+  },
+  "type": "module",
+  "dependencies": {
+    "axios": "^1.7.9",
+    "puppeteer": "^23.11.1",
+    "tsx": "^4.19.2"
+  }
+}
