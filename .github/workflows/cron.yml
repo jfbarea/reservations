@@ -2,7 +2,7 @@ name: Ejecutar script diario
 
 on:
   schedule:
-    - cron: '0 22 * * *'
+    - cron: '30 12 * * *'
 jobs:
   run-script:
     runs-on: ubuntu-latest
