@@ -1,5 +1,6 @@
 
 import dotenv from 'dotenv';
+import cron from 'node-cron';
 import  { Cookie } from 'puppeteer';
 
 import getFirstAvailableFly from './utils/getFirstAvailableFly';
@@ -8,7 +9,7 @@ import login from './utils/login';
 import reserve from './utils/reserve';
 dotenv.config();
 const { BERNARDO_PASS, BERNARDO_USER } = process.env
-const TEST_DATE = '2024-12-29';
+const TEST_DATE = '2024-12-30';
 const USERS = [
   {
     password: BERNARDO_PASS || '',
@@ -18,8 +19,7 @@ const USERS = [
 
 async function run(cookies: Cookie[]) {
   try { 
-    // const date = getDateInFourDays();
-    const date = TEST_DATE;
+    const date = getDateInFourDays();
     console.log('Realizando llamada autenticada...');
     console.log('Cookies:', cookies?.map(({ name, value }) => `${name}=${value}`).join('; '));
     const firstAvailableFly = await getFirstAvailableFly(cookies, date);
@@ -38,7 +38,14 @@ async function run(cookies: Cookie[]) {
     }
   }
 }
-
+cron.schedule('40 12 * * *', async () => {
+  const cookies = await Promise.all(USERS.map(user => login(user)));
+  if (cookies?.length>0) {
+    for (const cookie of cookies){
+      await run(cookie);
+    }
+  }
+});
 // Ejecución
 (async () => {
   const cookies = await Promise.all(USERS.map(user => login(user)));
