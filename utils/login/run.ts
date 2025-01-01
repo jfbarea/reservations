@@ -32,6 +32,9 @@ async function login({username, password}: {username: string, password: string})
 }
 
 ( async () => {
+  console.log(`Script de LOGIN iniciado a las ${new Date().toISOString()}`)
   const cookies = await Promise.all(S.USERS.map(user => login(user)));
   saveCookies(cookies);
+  console.log(`Script de LOGIN finalizado a las ${new Date().toISOString()}`)
+
 })()
