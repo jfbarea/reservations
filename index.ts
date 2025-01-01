@@ -17,7 +17,7 @@ async function run(cookies: Cookie[]) {
     const date = getDateInFourDays();
     const firstTryResponse = await firstTry(cookies, date);
     console.time('TIME getFirstAvailableFly');
-    if (firstTryResponse) {
+    if (!firstTryResponse) {
       const firstAvailableFly = await getFirstAvailableFly(cookies, date);
       console.timeEnd('TIME getFirstAvailableFly')
       if (firstAvailableFly) {
