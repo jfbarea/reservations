@@ -2,7 +2,10 @@
 import puppeteer from 'puppeteer';
 export default async function login({username, password}: {username: string, password: string}) {
   console.log(`Iniciando sesión para el usuario ${username} ${password}...`);
-  const browser = await puppeteer.launch({ headless: true });
+  const browser = await puppeteer.launch({
+  headless: true,
+  args: ['--no-sandbox', '--disable-setuid-sandbox'],
+});
   const page = await browser.newPage();
 
   await page.goto('https://www.alborangolf.com/app/reservas-abonados/login');

@@ -54,4 +54,5 @@ cron.schedule('40 12 * * *', async () => {
       await run(cookie);
     }
   }
+  console.log(`Script finalizado a las ${new Date().toISOString()}`)
 })();
