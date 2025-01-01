@@ -1,6 +1,7 @@
 
 import { Cookie } from "puppeteer";
 export default async function reserve(fly: number, cookies: Cookie[], date: string) {
+  console.time('TIME Reserva');
   const response = await fetch("https://www.alborangolf.com/app/reservas-abonados/api/reservas/reserva-nueva?dato=3939393", {
     "headers": {
       "accept": "application/json, text/plain, */*",
@@ -21,6 +22,14 @@ export default async function reserve(fly: number, cookies: Cookie[], date: stri
     "body": `{\"tarifa_id\":0,\"pais\":\"ES\",\"fecha\":\"${date}\",\"recorrido\":1,\"jugadores\":0,\"buggies\":0,\"fly\":${fly},\"nombre_jugador\":\"BERNARDO BAREA ROSADO\",\"datos_greenfees\":[]}`,
     "method": "POST"
   });
-  console.log('Respuesta:', await response.json());
-  console.log('Reserva realizada con éxito:', {fly, date});
+  const parsedResponse = await response.json();
+  console.timeEnd('TIME Reserva');
+  console.log('Respuesta de reserva:', parsedResponse);
+  if(parsedResponse.resultado === 'ko') { 
+    console.log('Error al reservar:', parsedResponse.errores);
+    return null;
+  }else{
+    console.log('Reserva realizada con éxito:', {fly, date});
+    return response;
+  }
 }
