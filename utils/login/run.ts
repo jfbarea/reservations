@@ -15,7 +15,8 @@ function saveCookies(cookies:Cookie[][]) {
 async function login({username, password}: {username: string, password: string}) {
   console.log(`Iniciando sesión para el usuario ${username} ${password}...`);
   const browser = await puppeteer.launch({
-  headless: true,
+    executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
+    headless: true,
   args: ['--no-sandbox', '--disable-setuid-sandbox'],
 });
   const page = await browser.newPage();
