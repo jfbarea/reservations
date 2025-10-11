@@ -12,12 +12,20 @@ function saveCookies(cookies:Cookie[][]) {
   console.log('Cookies guardadas en cookies.json');
 }
 
+const executablePath =
+  process.env.PUPPETEER_EXECUTABLE_PATH ||
+  '/usr/bin/chromium';
 async function login({username, password}: {username: string, password: string}) {
   console.log(`Iniciando sesión para el usuario ${username} ${password}...`);
   const browser = await puppeteer.launch({
-    executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
+    executablePath,
     headless: true,
-  args: ['--no-sandbox', '--disable-setuid-sandbox'],
+  args: [
+    '--no-sandbox',
+    '--disable-setuid-sandbox',
+    '--disable-dev-shm-usage',
+    '--disable-gpu'
+  ],
 });
   const page = await browser.newPage();
 
