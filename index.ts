@@ -39,11 +39,10 @@ async function run(cookies: Cookie[]) {
 // Ejecución
 (async () => {
   console.log(`Script iniciado a las ${new Date().toISOString()}`)
-  const cookies = loadCookies();
+  const cookies: Cookie[][] = loadCookies();
   if (cookies?.length>0) {
-    for (const cookie of cookies){
-      await run(cookie);
-    }
+    // Ejecutar todas las reservas en paralelo (seguro con hasta 4 usuarios)
+    await Promise.all(cookies.map((cookie) => run(cookie)));
   }
   console.log(`Script finalizado a las ${new Date().toISOString()}`)
   return;
