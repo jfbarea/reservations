@@ -1,0 +1,32 @@
+name: Daily Reservation
+
+on:
+  schedule:
+    # CET (invierno): 22:00 Madrid = 21:00 UTC
+    # CEST (verano): 22:00 Madrid = 20:00 UTC
+    # Disparamos a las 19:40 UTC para cubrir ambos casos.
+    # El script espera internamente hasta las 22:00 Europe/Madrid.
+    - cron: '40 19 * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Ejecutar en modo dry-run (login + consulta sin reservar)'
+        type: boolean
+        default: false
+
+jobs:
+  reserve:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm install
+      - run: npx tsx index.ts ${{ github.event.inputs.dry_run == 'true' && '--dry-run' || '' }}
+        env:
+          BERNARDO_USER: ${{ secrets.BERNARDO_USER }}
+          BERNARDO_PASS: ${{ secrets.BERNARDO_PASS }}
+          CECILIO_USER: ${{ secrets.CECILIO_USER }}
+          CECILIO_PASS: ${{ secrets.CECILIO_PASS }}
