@@ -1,5 +1,5 @@
-const TARGET_HOUR = 22;
-const TARGET_MINUTE = 0;
+const TARGET_HOUR = 21;
+const TARGET_MINUTE = 45;
 const TIMEZONE = 'Europe/Madrid';
 
 function getMadridTime(): Date {
