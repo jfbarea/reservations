@@ -1,0 +1,23 @@
+name: Test Dry Run
+
+on:
+  schedule:
+    - cron: '46 18 4 4 *'  # 18:46 UTC hoy (2026-04-04), una sola vez
+  workflow_dispatch:
+
+jobs:
+  dry-run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm install
+      - run: npx tsx index.ts --dry-run
+        env:
+          BERNARDO_USER: ${{ secrets.BERNARDO_USER }}
+          BERNARDO_PASS: ${{ secrets.BERNARDO_PASS }}
+          CECILIO_USER: ${{ secrets.CECILIO_USER }}
+          CECILIO_PASS: ${{ secrets.CECILIO_PASS }}
