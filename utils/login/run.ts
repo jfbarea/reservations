@@ -24,8 +24,11 @@ export async function login({username, password}: {username: string, password: s
   await page.type('input[name="form-password"]', password);
   await page.click('button[type="submit"]');
 
-  await page.waitForNetworkIdle({ idleTime: 1000, timeout: 30000 });
+  await page.waitForNetworkIdle({ idleTime: 2000, timeout: 30000 });
+  // Pequeño delay extra para asegurar que las cookies de sesión están asentadas
+  await new Promise(r => setTimeout(r, 1000));
   const cookies = await browser.cookies();
+  console.log(`Cookies obtenidas para ${username}:`, cookies.map(c => c.name));
   await browser.close();
   return cookies;
 }
