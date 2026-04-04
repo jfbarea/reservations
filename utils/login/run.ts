@@ -24,7 +24,7 @@ export async function login({username, password}: {username: string, password: s
   await page.type('input[name="form-password"]', password);
   await page.click('button[type="submit"]');
 
-  await page.waitForNavigation();
+  await page.waitForNetworkIdle({ idleTime: 1000, timeout: 30000 });
   const cookies = await browser.cookies();
   await browser.close();
   return cookies;
