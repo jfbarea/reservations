@@ -1,5 +1,5 @@
-const TARGET_HOUR = 21;
-const TARGET_MINUTE = 45;
+const TARGET_HOUR = 22;
+const TARGET_MINUTE = 0;
 const TIMEZONE = 'Europe/Madrid';
 
 function getMadridTime(): Date {
@@ -20,7 +20,7 @@ export default async function waitUntilTarget(): Promise<void> {
     return;
   }
 
-  const MAX_WAIT_MS = 15 * 60 * 1000; // 15 minutos
+  const MAX_WAIT_MS = 20 * 60 * 1000; // 20 minutos
   if (diff > MAX_WAIT_MS) {
     console.log(`Faltan más de 15 minutos (${Math.floor(diff / 60000)}m). Saltando ejecución para no gastar minutos de CI.`);
     process.exit(0);

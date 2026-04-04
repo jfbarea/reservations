@@ -2,11 +2,11 @@ name: Daily Reservation
 
 on:
   schedule:
-    # CEST (verano): 21:45 Madrid = 19:45 UTC → cron a las 19:40 UTC, espera ~5 min
-    - cron: '40 19 * * *'
-    # CET (invierno): 21:45 Madrid = 20:45 UTC → cron a las 20:40 UTC, espera ~5 min
-    # El cron de la temporada equivocada se salta (>15 min de espera → exit)
-    - cron: '40 20 * * *'
+    # CEST (verano): 21:45 Madrid = 19:45 UTC → cron a las 19:45 UTC, espera ~15 min hasta las 22:00
+    - cron: '45 19 * * *'
+    # CET (invierno): 21:45 Madrid = 20:45 UTC → cron a las 20:45 UTC, espera ~15 min hasta las 22:00
+    # El cron de la temporada equivocada se salta (>20 min de espera → exit)
+    - cron: '45 20 * * *'
   workflow_dispatch:
     inputs:
       dry_run:
