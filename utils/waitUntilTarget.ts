@@ -20,6 +20,12 @@ export default async function waitUntilTarget(): Promise<void> {
     return;
   }
 
+  const MAX_WAIT_MS = 15 * 60 * 1000; // 15 minutos
+  if (diff > MAX_WAIT_MS) {
+    console.log(`Faltan más de 15 minutos (${Math.floor(diff / 60000)}m). Saltando ejecución para no gastar minutos de CI.`);
+    process.exit(0);
+  }
+
   const minutes = Math.floor(diff / 60000);
   const seconds = Math.floor((diff % 60000) / 1000);
   console.log(`Esperando ${minutes}m ${seconds}s hasta las ${TARGET_HOUR}:${String(TARGET_MINUTE).padStart(2, '0')} Europe/Madrid...`);
