@@ -1,14 +1,14 @@
 import puppeteer, { Cookie } from 'puppeteer';
 import S from '../../settings'
 
-const executablePath =
-  process.env.PUPPETEER_EXECUTABLE_PATH ||
-  '/usr/bin/chromium';
+// Si se define PUPPETEER_EXECUTABLE_PATH se usa ese binario (ej: /usr/bin/chromium en Linux).
+// Si no, Puppeteer usa su Chromium bundled (comportamiento por defecto en GitHub Actions).
+const executablePath = process.env.PUPPETEER_EXECUTABLE_PATH || undefined;
 
 export async function login({username, password}: {username: string, password: string}) {
   console.log(`Iniciando sesión para el usuario ${username}...`);
   const browser = await puppeteer.launch({
-    executablePath,
+    ...(executablePath ? { executablePath } : {}),
     headless: true,
   args: [
     '--no-sandbox',
