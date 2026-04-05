@@ -2,11 +2,12 @@ name: Daily Reservation
 
 on:
   schedule:
-    # CEST (verano): 21:45 Madrid = 19:45 UTC → cron a las 19:45 UTC, espera ~15 min hasta las 22:00
-    - cron: '45 19 * * *'
-    # CET (invierno): 21:45 Madrid = 20:45 UTC → cron a las 20:45 UTC, espera ~15 min hasta las 22:00
-    # El cron de la temporada equivocada se salta (>20 min de espera → exit)
-    - cron: '45 20 * * *'
+    # CEST (verano): 21:30 Madrid = 19:30 UTC → cron a las 19:30 UTC, espera ~30 min hasta las 22:00
+    # Buffer de 30 min para absorber retrasos de GitHub Actions (típico: 0-15 min)
+    - cron: '30 19 * * *'
+    # CET (invierno): 21:30 Madrid = 20:30 UTC → cron a las 20:30 UTC, espera ~30 min hasta las 22:00
+    # El cron de la temporada equivocada se salta (>35 min de espera → exit)
+    - cron: '30 20 * * *'
   workflow_dispatch:
     inputs:
       dry_run:
@@ -18,7 +19,7 @@ jobs:
   reserve:
     runs-on: ubuntu-latest
     environment: production
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
