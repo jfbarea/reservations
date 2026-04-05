@@ -2,7 +2,7 @@ name: Test Dry Run
 
 on:
   schedule:
-    - cron: '34 19 4 4 *'  # 19:34 UTC hoy (2026-04-04), una sola vez
+    - cron: '23 19 4 4 *'  # 19:23 UTC hoy (2026-04-04), una sola vez
   workflow_dispatch:
 
 jobs:
