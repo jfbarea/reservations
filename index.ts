@@ -58,10 +58,18 @@ async function run(cookies: Cookie[]) {
   if (DRY_RUN) {
     console.log('[DRY-RUN] Modo dry-run activado. No se realizarán reservas.');
   } else {
-    await waitUntilTarget();
+    // Comprobar si merece la pena ejecutar (descarta el cron de la temporada equivocada)
+    await waitUntilTarget({ checkOnly: true });
   }
 
+  // Login anticipado: se hace antes de las 22:00 para que las cookies estén listas
   const cookies: Cookie[][] = await loginAll();
+
+  if (!DRY_RUN) {
+    // Esperar hasta las 22:00:00 exactas para lanzar la reserva
+    await waitUntilTarget({ checkOnly: false });
+  }
+
   if (cookies?.length > 0) {
     await Promise.all(cookies.map((cookie) => run(cookie)));
   }
