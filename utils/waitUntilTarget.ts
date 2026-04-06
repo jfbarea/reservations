@@ -8,7 +8,7 @@ function getMadridTime(): Date {
   return new Date(madridStr);
 }
 
-const MAX_WAIT_MS = 65 * 60 * 1000; // 65 minutos — descarta el cron de la temporada equivocada
+const MAX_WAIT_MS = 50 * 60 * 1000; // 50 minutos — descarta el cron de la temporada equivocada
 const TARGET_STR = `${TARGET_HOUR}:${String(TARGET_MINUTE).padStart(2, '0')}`;
 
 // checkOnly: solo comprueba si merece ejecutar (sale si la espera es >20 min), sin esperar
@@ -36,7 +36,7 @@ export default async function waitUntilTarget({ checkOnly = false } = {}): Promi
   }
 
   if (diff > MAX_WAIT_MS) {
-    console.log(`Faltan más de 65 minutos (${Math.floor(diff / 60000)}m). Saltando ejecución para no gastar minutos de CI.`);
+    console.log(`Faltan más de 50 minutos (${Math.floor(diff / 60000)}m). Saltando ejecución para no gastar minutos de CI.`);
     process.exit(0);
   }
 
