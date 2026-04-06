@@ -21,7 +21,17 @@ export default async function waitUntilTarget({ checkOnly = false } = {}): Promi
   const diff = target.getTime() - madridNow.getTime();
 
   if (diff <= 0) {
-    if (!checkOnly) console.log(`Ya son las ${TARGET_STR} o más tarde en Madrid. Ejecutando inmediatamente.`);
+    if (checkOnly) {
+      // Si ya pasó la hora, solo ejecutar si fue hace menos de 5 minutos (pequeño retraso del CI)
+      // Si fue hace más, es el cron de la temporada equivocada → saltar
+      const LATE_TOLERANCE_MS = 5 * 60 * 1000;
+      if (Math.abs(diff) > LATE_TOLERANCE_MS) {
+        console.log(`Ya son las ${TARGET_STR} + ${Math.floor(Math.abs(diff) / 60000)}m. Demasiado tarde, saltando.`);
+        process.exit(0);
+      }
+    } else {
+      console.log(`Ya son las ${TARGET_STR} o más tarde en Madrid. Ejecutando inmediatamente.`);
+    }
     return;
   }
 
