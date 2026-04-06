@@ -5,7 +5,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "tsx index.ts",
-    "start:dry": "tsx index.ts --dry-run"
+    "start:dry": "tsx index.ts --dry-run",
+    "daemon": "tsx daemon.ts"
   },
   "author": "",
   "license": "ISC",
@@ -16,6 +17,7 @@
   "type": "module",
   "dependencies": {
     "axios": "^1.7.9",
+    "node-cron": "^3.0.3",
     "dotenv": "^16.4.7",
     "puppeteer": "^23.11.1",
     "tsx": "^4.19.2"
