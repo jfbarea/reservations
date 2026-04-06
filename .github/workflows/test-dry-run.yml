@@ -2,7 +2,18 @@ name: Test Dry Run
 
 on:
   schedule:
-    - cron: '23 19 4 4 *'  # 19:23 UTC hoy (2026-04-04), una sola vez
+    # TEST 1 — 00:00 UTC (02:00 CEST) inicio de hora, suele haber carga alta
+    - cron: '0 0 7 4 *'
+    # TEST 2 — 00:30 UTC (02:30 CEST) media hora, para comparar con inicio de hora
+    - cron: '30 0 7 4 *'
+    # TEST 3 — 07:00 UTC (09:00 CEST) mañana, hora punta de trabajo
+    - cron: '0 7 7 4 *'
+    # TEST 4 — 07:30 UTC (09:30 CEST) media hora
+    - cron: '30 7 7 4 *'
+    # TEST 5 — 17:00 UTC (19:00 CEST) tarde, otra hora punta
+    - cron: '0 17 7 4 *'
+    # TEST 6 — 17:30 UTC (19:30 CEST) media hora
+    - cron: '30 17 7 4 *'
   workflow_dispatch:
 
 jobs:
@@ -16,6 +27,10 @@ jobs:
         with:
           node-version: '20'
       - run: npm install
+      - run: |
+          echo "Cron programado para: ${{ github.event.schedule }}"
+          echo "Hora de ejecución real: $(date -u)"
+        name: Log scheduled vs real time
       - run: npx tsx index.ts --dry-run
         env:
           BERNARDO_USER: ${{ secrets.BERNARDO_USER }}
