@@ -1,7 +1,11 @@
 
 import { Cookie } from "puppeteer";
-export default async function reserve(fly: number, cookies: Cookie[], date: string) {
-  console.time('TIME Reserva');
+
+export type ReserveResult =
+  | { ok: true; nombre: string; hora: string }
+  | { ok: false; nombre: string; errores: string };
+
+export default async function reserve(fly: number, cookies: Cookie[], date: string, hora?: string): Promise<ReserveResult> {
   const response = await fetch("https://www.alborangolf.com/app/reservas-abonados/api/reservas/reserva-nueva?dato=3939393", {
     "headers": {
       "accept": "application/json, text/plain, */*",
@@ -23,13 +27,15 @@ export default async function reserve(fly: number, cookies: Cookie[], date: stri
     "method": "POST"
   });
   const parsedResponse = await response.json();
-  console.timeEnd('TIME Reserva');
-  console.log('Respuesta de reserva:', parsedResponse);
-  if(parsedResponse.resultado === 'ko') { 
-    console.log('Error al reservar:', parsedResponse.errores);
-    return null;
-  }else{
-    console.log('Reserva realizada con éxito:', {fly, date});
-    return response;
+  const data = parsedResponse.abonoid ?? parsedResponse.abono ?? {};
+  const nombre: string = data.nombre_jugador ?? 'Desconocido';
+  if (parsedResponse.resultado === 'ko') {
+    const errores = parsedResponse.errores?.join(', ') ?? 'Error desconocido';
+    console.log(`[${nombre}] no reservado: ${errores}`);
+    return { ok: false, nombre, errores };
+  } else {
+    const horaFinal = hora ?? `fly ${fly}`;
+    console.log(`[${nombre}] reservado a las ${horaFinal} para ${date}`);
+    return { ok: true, nombre, hora: horaFinal };
   }
 }

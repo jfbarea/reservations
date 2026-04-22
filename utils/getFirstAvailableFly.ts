@@ -1,6 +1,6 @@
-import { Cookie } from 'puppeteer'; 
+import { Cookie } from 'puppeteer';
 
-export default async function getFirstAvailableFly(cookies: Cookie[], date: string) {
+export default async function getFirstAvailableFly(cookies: Cookie[], date: string): Promise<{ fly: number; hora: string } | null> {
   const response = await (await fetch("https://www.alborangolf.com/app/reservas-abonados/api/versalidas", {
     "headers": {
       "accept": "application/json, text/plain, */*",
@@ -21,16 +21,13 @@ export default async function getFirstAvailableFly(cookies: Cookie[], date: stri
     "body": `admin=0&fecha=${date}&idreserva=`,
     "method": "POST"
   })).json();
-  console.log('Respuesta Listado:', response);
   if(response.resultado === 'ko') {
     console.log('Error al comprobar flys disponibles:', response.errores);
     return null;
   }
-  const flyList = response.recorrido1;
-  for (const fly of flyList) {
+  for (const fly of response.recorrido1) {
     if (fly.jugadoreslibres > 0) {
-      console.log('Fly disponible:', fly);
-      return fly.fly;
+      return { fly: fly.fly, hora: fly.hora };
     }
   }
   return null;

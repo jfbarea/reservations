@@ -6,48 +6,67 @@ import getDateInFourDays from './utils/getDateInFourDays';
 import { loginAll } from './utils/login';
 import reserve from './utils/reserve';
 import waitUntilTarget from './utils/waitUntilTarget';
+import { notify } from './utils/notify';
+import S from './settings';
 
 const FIRST_FLY = 5;
+const FIRST_FLY_HORA = '8:02';
 const DRY_RUN = process.argv.includes('--dry-run');
 
-async function firstTry(cookies: Cookie[], date: string) {
-  console.log('Reservando fly:', {FIRST_FLY, date});
-  return await reserve(FIRST_FLY, cookies, date);
-}
+async function run(cookies: Cookie[], email: string) {
+  const date = getDateInFourDays();
 
-async function run(cookies: Cookie[]) {
+  if (DRY_RUN) {
+    console.log('[DRY-RUN] Login OK. Consultando flys disponibles...');
+    const result = await getFirstAvailableFly(cookies, date);
+    if (result) {
+      console.log(`[DRY-RUN] Reservaría fly ${result.fly} a las ${result.hora} para ${date}`);
+    } else {
+      console.log(`[DRY-RUN] No hay flys disponibles para ${date}`);
+    }
+    return;
+  }
+
   try {
-    const date = getDateInFourDays();
+    const firstResult = await reserve(FIRST_FLY, cookies, date, FIRST_FLY_HORA);
 
-    if (DRY_RUN) {
-      console.log('[DRY-RUN] Login OK. Consultando flys disponibles...');
-      const firstAvailableFly = await getFirstAvailableFly(cookies, date);
-      if (firstAvailableFly) {
-        console.log(`[DRY-RUN] Reservaría fly ${firstAvailableFly} para ${date}`);
-      } else {
-        console.log(`[DRY-RUN] No hay flys disponibles para ${date}`);
-      }
+    if (firstResult.ok) return; // Reservado en el horario preferido, todo bien
+
+    // Fly 5 (8:02) no disponible — buscar alternativa
+    const fallback = await getFirstAvailableFly(cookies, date);
+
+    if (!fallback) {
+      await notify(
+        email,
+        `[Golf] ${firstResult.nombre}: sin reserva para ${date}`,
+        `No se ha podido reservar para ${date}.\n\nMotivo: ${firstResult.errores}\n\nNo había ningún fly disponible como alternativa.`
+      );
       return;
     }
 
-    const firstTryResponse = await firstTry(cookies, date);
-    console.time('TIME getFirstAvailableFly');
-    if (!firstTryResponse) {
-      const firstAvailableFly = await getFirstAvailableFly(cookies, date);
-      console.timeEnd('TIME getFirstAvailableFly')
-      if (firstAvailableFly) {
-        console.log('Reservando fly:', {firstAvailableFly, date});
-        await reserve(firstAvailableFly, cookies, date);
-      } else {
-        console.log('No hay flys disponibles');
-      }
+    const fallbackResult = await reserve(fallback.fly, cookies, date, fallback.hora);
+
+    if (fallbackResult.ok) {
+      await notify(
+        email,
+        `[Golf] ${fallbackResult.nombre}: reservado a las ${fallbackResult.hora} (no a las ${FIRST_FLY_HORA})`,
+        `Reserva realizada para ${date}, pero NO en el horario preferido.\n\nHorario reservado: ${fallbackResult.hora}\nMotivo por el que falló ${FIRST_FLY_HORA}: ${firstResult.errores}`
+      );
+    } else {
+      await notify(
+        email,
+        `[Golf] ${fallbackResult.nombre}: sin reserva para ${date}`,
+        `No se ha podido reservar para ${date}.\n\nIntento 1 (${FIRST_FLY_HORA}): ${firstResult.errores}\nIntento 2 (${fallback.hora}): ${fallbackResult.errores}`
+      );
     }
   } catch (error) {
-    if (error instanceof Error) {
-      console.error('Error en la llamada autenticada:', error.message);
-    } else {
-      console.error('Error en la llamada autenticada:', error);
-    }
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error('Error en la reserva:', msg);
+    await notify(
+      email,
+      `[Golf] Error inesperado en la reserva para ${date}`,
+      `Se produjo un error inesperado al intentar reservar para ${date}.\n\nError: ${msg}`
+    );
   }
 }
 
@@ -71,7 +90,7 @@ async function run(cookies: Cookie[]) {
   }
 
   if (cookies?.length > 0) {
-    await Promise.all(cookies.map((cookie) => run(cookie)));
+    await Promise.all(cookies.map((cookie, i) => run(cookie, S.USERS[i].username)));
   }
   console.log(`Script finalizado a las ${new Date().toISOString()}`);
   return;

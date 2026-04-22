@@ -1,13 +1,6 @@
 name: Daily Reservation
 
 on:
-  schedule:
-    # CEST (verano): 21:13 Madrid = 19:13 UTC → cron a las 19:13 UTC, espera ~47 min hasta las 22:00
-    # Buffer de 47 min para absorber retrasos de GitHub Actions (máx. observado: ~33 min)
-    - cron: '13 19 * * *'
-    # CET (invierno): 21:13 Madrid = 20:13 UTC → cron a las 20:13 UTC, espera ~47 min hasta las 22:00
-    # El cron de la temporada equivocada se salta (>50 min de espera → exit)
-    - cron: '13 20 * * *'
   workflow_dispatch:
     inputs:
       dry_run:
@@ -32,3 +25,5 @@ jobs:
           BERNARDO_PASS: ${{ secrets.BERNARDO_PASS }}
           CECILIO_USER: ${{ secrets.CECILIO_USER }}
           CECILIO_PASS: ${{ secrets.CECILIO_PASS }}
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
